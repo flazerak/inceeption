@@ -1,0 +1,56 @@
+version: "3.3"
+
+services:
+ mariadb:
+  build: ./requirements/mariaDB
+  networks:
+   - inception
+  env_file:
+   - ../.env
+  restart: always
+  volumes:
+   - vol_mariadb:/var/lib/mysql
+
+ nginx:
+  build: ./requirements/nginx
+  depends_on:
+   - wordpress
+  ports:
+   - 443:443
+  volumes:
+   - vol_wordpress:/var/www/html
+  networks:
+   - inception
+  env_file:
+   - ../.env
+  restart: always
+
+ wordpress:
+  build: ./requirements/wordpress
+  networks:
+   - inception
+  env_file:
+   - ../.env
+  volumes:
+   - vol_wordpress:/var/www/html
+  depends_on:
+   - mariadb
+  restart: always
+  
+
+networks:
+ inception:
+
+volumes:
+ vol_wordpress:
+  driver: local
+  driver_opts:
+    device: /Users/flazerak/Desktop/data/vol_wordpress
+    type: none
+    o: bind
+ vol_mariadb:
+  driver: local
+  driver_opts:
+    device: /Users/flazerak/Desktop/data/vol_mariadb
+    type: none
+    o: bind
